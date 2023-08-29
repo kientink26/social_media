@@ -1,0 +1,135 @@
+# This file is VSCode specific
+# you must have "humao.rest-client" extension installed.
+
+@host = http://localhost:6001
+
+### Create user
+POST {{host}}/api/users
+Content-Type: application/json
+
+{
+    "email": "jane@example.com",
+    "username": "jane",
+    "password": "123456"
+}
+
+### Login to get authentication token
+# @name login
+POST {{host}}/api/login
+Content-Type: application/json
+
+{
+    "email": "jane@example.com",
+    "password": "123456"
+}
+
+### Get authenticated user profile
+GET {{host}}/api/auth_user
+Authorization: Bearer {{login.response.body.token}}
+
+### Get a new token
+GET {{host}}/api/token
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all users profiles
+GET {{host}}/api/users
+?search=test
+&first=2
+&after=jane
+Authorization: Bearer {{login.response.body.token}}
+
+### Get a specific user profile
+GET {{host}}/api/users/jane
+Authorization: Bearer {{login.response.body.token}}
+
+### Toggle follow a specific user
+POST {{host}}/api/users/jane/toggle_follow
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all followers of a specific user
+GET {{host}}/api/users/john/followers
+?first=
+&after=
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all followees of a specific user
+GET {{host}}/api/users/jane/followees
+?first=
+&after=
+Authorization: Bearer {{login.response.body.token}}
+
+### Create a timeline item (a post)
+# @name createTimelineItem
+POST {{host}}/api/timeline
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+    "content": "new post"
+}
+
+### Get timeline of authenticated user
+# @name getTimelineItem
+GET {{host}}/api/timeline
+?last=2
+&before={{getTimelineItem.response.body.endCursor}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all posts of a specific user
+# @name getPosts
+GET {{host}}/api/users/jane/posts
+?last=2
+&before={{getPosts.response.body.endCursor}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Get a specific post
+GET {{host}}/api/posts/{{createTimelineItem.response.body.post.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Toggle like post
+POST {{host}}/api/posts/{{createTimelineItem.response.body.post.id}}/toggle_like
+Authorization: Bearer {{login.response.body.token}}
+
+### Toggle post subscription
+POST {{host}}/api/posts/{{createTimelineItem.response.body.post.id}}/toggle_subscription
+Authorization: Bearer {{login.response.body.token}}
+
+### Create comment to a specific post
+# @name createComment
+POST {{host}}/api/posts/{{createTimelineItem.response.body.post.id}}/comments
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+    "content": "new comment from bob, hello @jane"
+}
+
+### Get all comments of a specific post
+# @name getComments
+GET {{host}}/api/posts/{{createTimelineItem.response.body.post.id}}/comments
+?last=2
+&before={{getComments.response.body.endCursor}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Toggle like comment
+POST {{host}}/api/comments/{{createComment.response.body.id}}/toggle_like
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all notifications of authenticated user
+# @name notifications
+GET {{host}}/api/notifications
+?last=2
+&before={{notifications.response.body.endCursor}}
+Authorization: Bearer {{login.response.body.token}}
+
+### Does auth user have unread notifications ?
+GET {{host}}/api/has_unread_notifications
+Authorization: Bearer {{login.response.body.token}}
+
+###
+POST {{host}}/api/notifications/{{notifications.response.body.items.1.id}}/mark_as_read
+Authorization: Bearer {{login.response.body.token}}
+
+### Mark all notifications as read
+POST {{host}}/api/mark_notifications_as_read
+Authorization: Bearer {{login.response.body.token}}

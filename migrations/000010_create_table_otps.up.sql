@@ -1,0 +1,5 @@
+CREATE TABLE otps (
+    hash bytea PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users ON DELETE CASCADE,
+    expiry TIMESTAMPTZ NOT NULL
+);
